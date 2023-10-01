@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Form</title>
+    <script src="https://unpkg.com/htmx.org@1.5.0/dist/htmx.js"></script>
+
+    <style>
+      .whatsapp-message {
+        background-color: #dcf8c6;
+        border-radius: 15px;
+        max-width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      .whatsapp-message .message-text {
+        font-size: 16px;
+        word-wrap: break-word;
+      }
+
+      .whatsapp-message .message-info {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+      }
+
+      .whatsapp-message.sent {
+        background-color: #25d366;
+        color: #fff;
+        align-self: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Form</h1>
+
+    <form hx-post="/send" hx-target="#message-sent" hx-swap="outerHTML">
+      <input type="text" name="message" placeholder="Type your message" />
+      <button type="submit" hx-trigger="click">Send</button>
+    </form>
+
+    <div id="message-sent">
+      <!-- Messages received from the WebSocket will be displayed here -->
+    </div>
+
+    <div id="message-form">
+      <!-- Messages received from the WebSocket will be displayed here -->
+    </div>
+
+    <script>
+      // Function to handle WebSocket communication
+      function setupWebSocket() {
+        var ws = new WebSocket("ws://localhost:8000/ws");
+
+        ws.onmessage = function (event) {
+          // Display messages received from the WebSocket
+          var messageForm = document.getElementById("message-form");
+          messageForm.innerHTML += `<div class="whatsapp-message">
+              <div class="message-text">${event.data}</div>
+              <div class="message-info">Respuesta</div>
+            </div>`;
+        };
+
+        ws.onclose = function (event) {
+          // Handle WebSocket close event if needed
+          console.log("WebSocket closed:", event);
+        };
+
+        return ws;
+      }
+
+      // Initialize WebSocket connection
+      var ws = setupWebSocket();
+    </script>
+  </body>
+</html>
